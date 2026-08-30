@@ -1,0 +1,7 @@
+CREATE DATABASE IF NOT EXISTS UK_Road_Safety_Analytics;
+
+SHOW DATABASES ;
+
+USE UK_Road_Safety_Analytics;
+
+SELECT DATABASE();
