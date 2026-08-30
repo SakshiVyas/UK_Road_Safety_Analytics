@@ -1,0 +1,11 @@
+# DataGrip / JetBrains
+.idea/
+
+# macOS
+.DS_Store
+
+# Log files
+*.log
+
+# Large raw datasets
+data/raw/
