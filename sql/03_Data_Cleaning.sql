@@ -4,6 +4,9 @@ USE UK_Road_Safety_Analytics;
 -- changing it to null--
 -- first table collision --
 
+SET SQL_SAFE_UPDATES = 0;
+
+
 SELECT COUNT(*) AS missing_first_road_class
 FROM collision
 WHERE first_road_class=-1;

@@ -1,5 +1,14 @@
 USE UK_Road_Safety_Analytics;
 
+SHOW VARIABLES LIKE 'local_infile';
+-- should be ON--
+-- if it's off, run: SET GLOBAL local_infile = ON;
+SHOW VARIABLES LIKE 'sql_safe_updates';
+
+SET SQL_SAFE_UPDATES = 0;
+
+SELECT @@SQL_SAFE_UPDATES;
+
 CREATE TABLE collision(
     collision_index VARCHAR(13) PRIMARY KEY,
     collision_ref_no VARCHAR(9) NOT NULL ,
@@ -43,15 +52,94 @@ CREATE TABLE collision(
 
 DESCRIBE collision;
 
-SELECT COUNT(*) AS collision_rows
-FROM collision;
-
 ALTER TABLE collision
 MODIFY collision_date VARCHAR(10) NOT NULL;
 
+-- import collision data--
+
+LOAD DATA LOCAL INFILE '/PATH/TO/dft-road-casualty-statistics-collision-last-5-years.csv'
+INTO TABLE collision
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(
+    collision_index,
+    @collision_year,
+    collision_ref_no,
+
+    @location_easting_osgr,
+    @location_northing_osgr,
+    @longitude,
+    @latitude,
+
+    police_force,
+    collision_severity,
+    number_of_vehicles,
+    number_of_casualties,
+
+    collision_date,
+
+    @day_of_week,
+
+    collision_time,
+
+    @local_authority_district,
+
+    local_authority_ons_district,
+    local_authority_highway,
+    local_authority_highway_current,
+
+    first_road_class,
+    first_road_number,
+    road_type,
+    speed_limit,
+
+    @junction_detail_historic,
+
+    junction_detail,
+    junction_control,
+    second_road_class,
+    second_road_number,
+
+    @pedestrian_crossing_human_control_historic,
+    @pedestrian_crossing_physical_facilities_historic,
+
+    pedestrian_crossing,
+    light_conditions,
+    weather_conditions,
+    road_surface_conditions,
+    special_conditions_at_site,
+
+    @carriageway_hazards_historic,
+
+    carriageway_hazards,
+    urban_or_rural_area,
+    did_police_officer_attend_scene_of_accident,
+    trunk_road_flag,
+    lsoa_of_accident_location,
+    enhanced_severity_collision,
+    collision_injury_based,
+    collision_adjusted_severity_serious,
+    collision_adjusted_severity_slight
+)
+SET
+    location_easting_osgr =
+        NULLIF(@location_easting_osgr, ''),
+    location_northing_osgr =
+        NULLIF(@location_northing_osgr, ''),
+    longitude =
+        NULLIF(@longitude, ''),
+    latitude =
+        NULLIF(@latitude, '');
+
+
+-- Verify --
 SELECT COUNT(*) AS collision_rows
 FROM collision;
 
+-- CONVERT COLLISION DATE TO MYSQL DATE TYPE--
 
 SELECT collision_index, collision_date, collision_time
 FROM collision
@@ -136,6 +224,59 @@ CREATE TABLE vehicle(
 
 DESCRIBE vehicle;
 
+-- IMPORT VEHICLE DATA--
+
+LOAD DATA LOCAL INFILE '/PATH/TO/dft-road-casualty-statistics-vehicle-last-5-years.csv'
+INTO TABLE vehicle
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(
+    collision_index,
+    @collision_year,
+    @collision_ref_no,
+
+    vehicle_reference,
+    vehicle_type,
+    towing_and_articulation,
+
+    @vehicle_manoeuvre_historic,
+
+    vehicle_manoeuvre,
+    vehicle_direction_from,
+    vehicle_direction_to,
+
+    @vehicle_location_restricted_lane_historic,
+
+    vehicle_location_restricted_lane,
+    junction_location,
+    skidding_and_overturning,
+    hit_object_in_carriageway,
+    vehicle_leaving_carriageway,
+    hit_object_off_carriageway,
+    first_point_of_impact,
+    vehicle_left_hand_drive,
+
+    @journey_purpose_of_driver_historic,
+
+    journey_purpose_of_driver,
+    sex_of_driver,
+    age_of_driver,
+
+    @age_band_of_driver,
+
+    engine_capacity_cc,
+    propulsion_code,
+    age_of_vehicle,
+    generic_make_model,
+    driver_imd_decile,
+    lsoa_of_driver,
+    escooter_flag,
+    driver_distance_banding
+);
+
 SELECT COUNT(*) AS vehicle_rows
 FROM vehicle;
 
@@ -169,9 +310,69 @@ CREATE TABLE casualty (
 
 DESCRIBE casualty;
 
+
+-- IMPORT CASUALTY DATA--
+
+LOAD DATA LOCAL INFILE '/PATH/TO/dft-road-casualty-statistics-casualty-last-5-years.csv'
+INTO TABLE casualty
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(
+    collision_index,
+    @collision_year,
+    @collision_ref_no,
+
+    vehicle_reference,
+    casualty_reference,
+    casualty_class,
+    sex_of_casualty,
+    age_of_casualty,
+
+    @age_band_of_casualty,
+
+    casualty_severity,
+    pedestrian_location,
+    pedestrian_movement,
+    car_passenger,
+    bus_or_coach_passenger,
+    pedestrian_road_maintenance_worker,
+    casualty_type,
+    casualty_imd_decile,
+    lsoa_of_casualty,
+    enhanced_casualty_severity,
+    casualty_injury_based,
+    casualty_adjusted_severity_serious,
+    casualty_adjusted_severity_slight,
+    casualty_distance_banding
+);
+
 SELECT COUNT(*) AS casualty_rows
 FROM casualty;
 
+
+-- FINAL CORE DATA IMPORT CHECK--
+
+SELECT
+    'collision' AS table_name,
+    COUNT(*) AS row_count
+FROM collision
+
+UNION ALL
+
+SELECT
+    'vehicle',
+    COUNT(*)
+FROM vehicle
+
+UNION ALL
+
+SELECT
+    'casualty',
+    COUNT(*)
+FROM casualty;
 
 -- transaction table---
 
