@@ -57,7 +57,7 @@ MODIFY collision_date VARCHAR(10) NOT NULL;
 
 -- import collision data--
 
-LOAD DATA LOCAL INFILE '/PATH/TO/dft-road-casualty-statistics-collision-last-5-years.csv'
+LOAD DATA LOCAL INFILE 'dataset/dft-road-casualty-statistics-collision-last-5-years.csv'
 INTO TABLE collision
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','
@@ -226,7 +226,7 @@ DESCRIBE vehicle;
 
 -- IMPORT VEHICLE DATA--
 
-LOAD DATA LOCAL INFILE '/PATH/TO/dft-road-casualty-statistics-vehicle-last-5-years.csv'
+LOAD DATA LOCAL INFILE 'dataset/dft-road-casualty-statistics-vehicle-last-5-years.csv'
 INTO TABLE vehicle
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','
@@ -313,7 +313,7 @@ DESCRIBE casualty;
 
 -- IMPORT CASUALTY DATA--
 
-LOAD DATA LOCAL INFILE '/PATH/TO/dft-road-casualty-statistics-casualty-last-5-years.csv'
+LOAD DATA LOCAL INFILE 'dataset/dft-road-casualty-statistics-casualty-last-5-years.csv'
 INTO TABLE casualty
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ','

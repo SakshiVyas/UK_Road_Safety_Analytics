@@ -16,9 +16,8 @@ Download the latest 5-year CSV files for:
 ## How to Run
 
 1. Download the three CSV files.
-2. In `02_Create_Tables.sql`, replace the `/PATH/TO/...` placeholders with your local file paths.
-3. Ensure `LOAD DATA LOCAL INFILE` is enabled.
-4. Run the SQL files in this order:
+2. Ensure `LOAD DATA LOCAL INFILE` is enabled.
+3. Run the SQL files in this order:
 
    01_Create_Database.sql
    02_Create_Tables.sql
